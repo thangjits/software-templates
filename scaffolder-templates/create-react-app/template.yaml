@@ -10,6 +10,7 @@ metadata:
 spec:
   owner: web@example.com
   type: website
+
   parameters:
     - title: Provide some simple information
       required:
@@ -33,6 +34,7 @@ spec:
           ui:options:
             allowedKinds:
               - Group
+
     - title: Choose a location
       required:
         - repoUrl
@@ -44,6 +46,8 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
+              - gitlab.com
+
   steps:
     - id: template
       name: Fetch Skeleton + Template
@@ -60,6 +64,7 @@ spec:
 
     - id: publish
       name: Publish
+      if: ${{ parameters.repoUrl | parseRepoUrl | eqHost('github.com') }}
       action: publish:github
       input:
         allowedHosts:
@@ -67,17 +72,27 @@ spec:
         description: This is ${{ parameters.component_id }}
         repoUrl: ${{ parameters.repoUrl }}
 
+    - id: publish_gitlab
+      name: Publish to GitLab
+      if: ${{ parameters.repoUrl | parseRepoUrl | eqHost('gitlab.com') }}
+      action: publish:gitlab
+      input:
+        allowedHosts:
+          - gitlab.com
+        description: This is ${{ parameters.component_id }}
+        repoUrl: ${{ parameters.repoUrl }}
+
     - id: register
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl || steps.publish_gitlab.output.repoContentsUrl }}
         catalogInfoPath: "/catalog-info.yaml"
 
   output:
     links:
       - title: Repository
-        url: ${{ steps.publish.output.remoteUrl }}
+        url: ${{ steps.publish.output.remoteUrl || steps.publish_gitlab.output.remoteUrl }}
       - title: Open in catalog
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
