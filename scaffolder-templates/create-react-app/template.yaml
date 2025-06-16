@@ -75,21 +75,19 @@ spec:
 
     - id: publish_github
       name: Publish to GitHub
-      if: ${{ steps.template.output.repoHost == "github.com" }}
+      if: ${{ parameters.repoUrl | parseRepoUrl | pick('host') == "github.com" }}
       action: publish:github
       input:
-        allowedHosts:
-          - github.com
+        allowedHosts: [github.com]
         description: This is ${{ parameters.component_id }}
         repoUrl: ${{ parameters.repoUrl }}
 
     - id: publish_gitlab
       name: Publish to GitLab
-      if: ${{ steps.template.output.repoHost == "gitlab.com" }}
+      if: ${{ parameters.repoUrl | parseRepoUrl | pick('host') == "gitlab.com" }}
       action: publish:gitlab
       input:
-        allowedHosts:
-          - gitlab.com
+        allowedHosts: [gitlab.com]
         description: This is ${{ parameters.component_id }}
         repoUrl: ${{ parameters.repoUrl }}
 
@@ -97,7 +95,7 @@ spec:
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps.publish_github.output.repoContentsUrl || steps.publish_gitlab.output.repoContentsUrl }}
+        repoContentsUrl: ${{ steps.publish_github.output?.repoContentsUrl || steps.publish_gitlab.output?.repoContentsUrl }}
         catalogInfoPath: "/catalog-info.yaml"
 
   output:
