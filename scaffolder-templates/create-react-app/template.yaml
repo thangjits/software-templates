@@ -64,8 +64,14 @@ spec:
           description: ${{ parameters.description }}
           destination: ${{ parameters.repoUrl | parseRepoUrl }}
           owner: ${{ parameters.owner }}
-      output:
-        repoHost: ${{ parameters.repoUrl | parseRepoUrl | pick('host') }}
+        output:
+          repoHost: ${{ parameters.repoUrl | parseRepoUrl | pick('host') | default('none') }}
+
+    - id: debug-host
+      name: Debug Repo Host
+      action: debug:log
+      input:
+        message: "Repository Host is ${{ steps.template.output.repoHost }}"
 
     - id: publish_github
       name: Publish to GitHub
