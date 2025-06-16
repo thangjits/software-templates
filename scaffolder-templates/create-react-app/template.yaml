@@ -47,6 +47,9 @@ spec:
             allowedHosts:
               - github.com
               - gitlab.com
+            allowedOwners:
+              - your-github-username-or-org
+              - your-gitlab-username-or-group
 
   steps:
     - id: template
@@ -61,10 +64,12 @@ spec:
           description: ${{ parameters.description }}
           destination: ${{ parameters.repoUrl | parseRepoUrl }}
           owner: ${{ parameters.owner }}
+      output:
+        repoHost: ${{ parameters.repoUrl | parseRepoUrl | pick('host') }}
 
-    - id: publish
-      name: Publish
-      if: ${{ parameters.repoUrl | parseRepoUrl | eqHost('github.com') }}
+    - id: publish_github
+      name: Publish to GitHub
+      if: ${{ steps.template.output.repoHost == "github.com" }}
       action: publish:github
       input:
         allowedHosts:
@@ -74,7 +79,7 @@ spec:
 
     - id: publish_gitlab
       name: Publish to GitLab
-      if: ${{ parameters.repoUrl | parseRepoUrl | eqHost('gitlab.com') }}
+      if: ${{ steps.template.output.repoHost == "gitlab.com" }}
       action: publish:gitlab
       input:
         allowedHosts:
@@ -86,13 +91,13 @@ spec:
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl || steps.publish_gitlab.output.repoContentsUrl }}
+        repoContentsUrl: ${{ steps.publish_github.output.repoContentsUrl || steps.publish_gitlab.output.repoContentsUrl }}
         catalogInfoPath: "/catalog-info.yaml"
 
   output:
     links:
       - title: Repository
-        url: ${{ steps.publish.output.remoteUrl || steps.publish_gitlab.output.remoteUrl }}
+        url: ${{ steps.publish_github.output.remoteUrl || steps.publish_gitlab.output.remoteUrl }}
       - title: Open in catalog
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
