@@ -47,9 +47,6 @@ spec:
             allowedHosts:
               - github.com
               - gitlab.com
-            allowedOwners:
-              - your-github-username-or-org
-              - your-gitlab-username-or-group
 
   steps:
     - id: template
@@ -64,30 +61,26 @@ spec:
           description: ${{ parameters.description }}
           destination: ${{ parameters.repoUrl | parseRepoUrl }}
           owner: ${{ parameters.owner }}
-        output:
-          repoHost: ${{ parameters.repoUrl | parseRepoUrl | pick('host') | default('none') }}
-
-    - id: debug-host
-      name: Debug Repo Host
-      action: debug:log
-      input:
-        message: "Repository Host is ${{ steps.template.output.repoHost }}"
+      output:
+        repoHost: ${{ parameters.repoUrl | parseRepoUrl | pick('host') }}
 
     - id: publish_github
       name: Publish to GitHub
-      if: ${{ parameters.repoUrl | parseRepoUrl | pick('host') == "github.com" }}
+      if: ${{ steps.template.output.repoHost == 'github.com' }}
       action: publish:github
       input:
-        allowedHosts: [github.com]
+        allowedHosts:
+          - github.com
         description: This is ${{ parameters.component_id }}
         repoUrl: ${{ parameters.repoUrl }}
 
     - id: publish_gitlab
       name: Publish to GitLab
-      if: ${{ parameters.repoUrl | parseRepoUrl | pick('host') == "gitlab.com" }}
+      if: ${{ steps.template.output.repoHost == 'gitlab.com' }}
       action: publish:gitlab
       input:
-        allowedHosts: [gitlab.com]
+        allowedHosts:
+          - gitlab.com
         description: This is ${{ parameters.component_id }}
         repoUrl: ${{ parameters.repoUrl }}
 
@@ -95,8 +88,15 @@ spec:
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps.publish_github.output?.repoContentsUrl || steps.publish_gitlab.output?.repoContentsUrl }}
-        catalogInfoPath: "/catalog-info.yaml"
+        repoContentsUrl: >-
+          ${{ steps.publish_github.output.repoContentsUrl || steps.publish_gitlab.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+    - id: debug_host
+      name: Debug Repo Host
+      action: debug:log
+      input:
+        message: Repository Host is ${{ steps.template.output.repoHost }}
 
   output:
     links:
