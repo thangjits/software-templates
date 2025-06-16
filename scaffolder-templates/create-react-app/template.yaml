@@ -44,7 +44,6 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
-              - gitlab.com
   steps:
     - id: template
       name: Fetch Skeleton + Template
@@ -65,15 +64,6 @@ spec:
       input:
         allowedHosts:
           - github.com
-        description: This is ${{ parameters.component_id }}
-        repoUrl: ${{ parameters.repoUrl }}
-
-    - id: publish
-      name: Publish
-      action: publish:gitlab
-      input:
-        allowedHosts:
-          - gitlab.com
         description: This is ${{ parameters.component_id }}
         repoUrl: ${{ parameters.repoUrl }}
 
