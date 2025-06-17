@@ -34,12 +34,11 @@ spec:
 
   steps:
     - id: fetch
-      name: Fetch
-      action: fetch:template
+      name: Fetch local source
+      action: fetch:plain
       input:
-        url: https://github.com/facebook/create-react-app/archive/refs/heads/main.zip
-        values:
-          name: ${{ parameters.name }}
+        url: ./code
+
     - id: createGitlabGroup
       name: Ensure Gitlab group exists
       action: gitlab:group:ensureExists
