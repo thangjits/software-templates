@@ -30,7 +30,8 @@ spec:
       name: Fetch Template
       action: fetch:template
       input:
-        url: https://github.com/facebook/create-react-app/archive/refs/heads/main.zip
+        url: https://github.com/backstage/software-templates/archive/refs/heads/main.zip
+        subpath: scaffolder-templates/create-react-app/template
         targetPath: .
 
     - id: rename
