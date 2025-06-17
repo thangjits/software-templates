@@ -1,59 +1,61 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: gitlab-demo
-  title: GitLab React App Scaffold
-  description: Deploy local React source code in ./code to GitLab repo
+  name: react-gitlab-template
+  title: Create React App (Deploy to GitLab)
+  description: Scaffold a React app and publish it to GitLab
 spec:
-  owner: backstage/techdocs-core
-  type: service
+  owner: user:guest
+  type: website
 
   parameters:
-    - title: Fill in some steps
+    - title: Provide project details
       required:
         - name
-        - repoUrl
+        - owner
+        - repo
       properties:
         name:
-          title: Component name
           type: string
-          description: Unique name of the component
-        repoUrl:
-          title: Repository Location
+          title: Project name
+        owner:
           type: string
-          ui:field: RepoUrlPicker
-          ui:options:
-            allowedHosts:
-              - gitlab.com
+          title: GitLab group or username
+        repo:
+          type: string
+          title: GitLab repository name
 
   steps:
     - id: fetch
-      name: Fetch source from local folder
-      action: fetch:template
+      name: Fetch local source
+      action: fetch:plain
       input:
-        url: ./code  # ✅ chỉ rõ thư mục chứa source
-        values:
-          name: ${{ parameters.name }}
+        url: ./code
+
+    - id: rename
+      name: Rename folder
+      action: fs:rename
+      input:
+        files:
+          - from: code
+            to: ${{ parameters.name }}
 
     - id: publish
       name: Publish to GitLab
       action: publish:gitlab
       input:
-        repoUrl: ${{ parameters.repoUrl }}
-        description: Published from Backstage scaffolder
-        defaultBranch: main
+        allowedHosts: ['gitlab.com']
+        description: React app deployed to GitLab
+        repoUrl: gitlab.com?owner=${{ parameters.owner }}&repo=${{ parameters.repo }}
 
     - id: register
       name: Register in catalog
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        repoContentsUrl: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}
+        catalogInfoPath: catalog-info.yaml
 
   output:
     links:
-      - title: GitLab Repository
-        url: ${{ steps.publish.output.remoteUrl }}
-      - title: Open in Catalog
-        icon: catalog
-        entityRef: ${{ steps.register.output.entityRef }}
+      - title: Repository
+        url: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}
