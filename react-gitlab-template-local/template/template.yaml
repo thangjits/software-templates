@@ -32,14 +32,6 @@ spec:
       input:
         url: ./code
 
-    - id: rename
-      name: Rename folder
-      action: fs:rename
-      input:
-        files:
-          - from: code
-            to: ${{ parameters.name }}
-
     - id: publish
       name: Publish to GitLab
       action: publish:gitlab
