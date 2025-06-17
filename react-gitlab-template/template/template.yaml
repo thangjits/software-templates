@@ -1,0 +1,62 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: react-gitlab-template
+  title: Create React App (Deploy to GitLab)
+  description: Scaffold a React app and publish it to GitLab
+spec:
+  owner: user:guest
+  type: website
+
+  parameters:
+    - title: Provide project details
+      required:
+        - name
+        - owner
+        - repo
+      properties:
+        name:
+          type: string
+          title: Project name
+        owner:
+          type: string
+          title: GitLab group or username
+        repo:
+          type: string
+          title: GitLab repository name
+
+  steps:
+    - id: fetch
+      name: Fetch Template
+      action: fetch:template
+      input:
+        url: https://github.com/facebook/create-react-app/archive/refs/heads/main.zip
+        targetPath: .
+
+    - id: rename
+      name: Rename App
+      action: fs:rename
+      input:
+        files:
+          - from: create-react-app-main
+            to: ${{ parameters.name }}
+
+    - id: publish
+      name: Publish to GitLab
+      action: publish:gitlab
+      input:
+        allowedHosts: ['gitlab.com']
+        description: React app deployed to GitLab
+        repoUrl: gitlab.com?owner=${{ parameters.owner }}&repo=${{ parameters.repo }}
+
+    - id: register
+      name: Register in catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}
+        catalogInfoPath: catalog-info.yaml
+
+  output:
+    links:
+      - title: Repository
+        url: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}
