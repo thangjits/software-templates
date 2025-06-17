@@ -1,45 +1,23 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: create-react-app-gitlab-template
-  title: Create React App Template (GitLab)
-  description: Create a new CRA website project and publish to GitLab
-  tags:
-    - react
-    - gitlab
-    - cra
+  name: gitlab-demo
+  title: GitLab React App Scaffold
+  description: Deploy local React source code in ./code to GitLab repo
 spec:
-  owner: web@example.com
-  type: website
+  owner: backstage/techdocs-core
+  type: service
 
   parameters:
-    - title: Provide some simple information
+    - title: Fill in some steps
       required:
-        - component_id
-        - owner
-      properties:
-        component_id:
-          title: Name
-          type: string
-          description: Unique name of the component
-          ui:field: EntityNamePicker
-        description:
-          title: Description
-          type: string
-          description: Help others understand what this website is for
-        owner:
-          title: Owner
-          type: string
-          description: Owner of the component
-          ui:field: OwnerPicker
-          ui:options:
-            allowedKinds:
-              - Group
-
-    - title: Choose a location
-      required:
+        - name
         - repoUrl
       properties:
+        name:
+          title: Component name
+          type: string
+          description: Unique name of the component
         repoUrl:
           title: Repository Location
           type: string
@@ -47,43 +25,35 @@ spec:
           ui:options:
             allowedHosts:
               - gitlab.com
-            requestUserCredentials:
-              enabled: true
 
   steps:
-    - id: template
-      name: Fetch Skeleton + Template
+    - id: fetch
+      name: Fetch source from local folder
       action: fetch:template
       input:
-        url: ./code
-        copyWithoutRender:
-          - .gitlab-ci.yml
+        url: ./code  # ✅ chỉ rõ thư mục chứa source
         values:
-          component_id: ${{ parameters.component_id }}
-          description: ${{ parameters.description }}
-          destination: ${{ parameters.repoUrl | parseRepoUrl }}
-          owner: ${{ parameters.owner }}
+          name: ${{ parameters.name }}
 
     - id: publish
-      name: Publish
+      name: Publish to GitLab
       action: publish:gitlab
       input:
-        allowedHosts:
-          - gitlab.com
-        description: This is ${{ parameters.component_id }}
         repoUrl: ${{ parameters.repoUrl }}
+        description: Published from Backstage scaffolder
+        defaultBranch: main
 
     - id: register
-      name: Register
+      name: Register in catalog
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
-        catalogInfoPath: "/catalog-info.yaml"
+        catalogInfoPath: '/catalog-info.yaml'
 
   output:
     links:
-      - title: Repository
+      - title: GitLab Repository
         url: ${{ steps.publish.output.remoteUrl }}
-      - title: Open in catalog
+      - title: Open in Catalog
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
