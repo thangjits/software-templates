@@ -2,32 +2,34 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: Gitlab DEMO 3
+  title: Gitlab DEMO 4
   description: Scaffolder Gitlab Demo
 spec:
   owner: backstage/techdocs-core
   type: service
 
   parameters:
-    - title: Fill in some steps
+    - title: Fill in service info
       required:
         - name
-      properties:
-        name:
-          title: Name
-          type: string
-          description: Unique name of the component
-          ui:autofocus: true
-          ui:options:
-            rows: 5
-    - title: Choose a repository name
-      required:
+        - group
         - repo
       properties:
+        name:
+          title: Project Name
+          type: string
+          description: Tên project (hiển thị)
+          ui:autofocus: true
+
+        group:
+          title: GitLab Group Name
+          type: string
+          description: Tên namespace/group trong GitLab mà bạn có quyền
+          
         repo:
           title: Repository Name
           type: string
-          description: Name of the new GitLab repository
+          description: Tên repo sẽ được tạo trong group
 
   steps:
     - id: fetch
@@ -41,7 +43,7 @@ spec:
       action: publish:gitlab
       input:
         description: This is ${{ parameters.name }}
-        repoUrl: gitlab.com?owner=thanghumg113-group&repo=${{ parameters.repo }}
+        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
         sourcePath: pimcore
         defaultBranch: main
 
@@ -49,7 +51,7 @@ spec:
       name: Create Deploy Token
       action: gitlab:projectDeployToken:create
       input:
-        repoUrl: gitlab.com?owner=thanghumg113-group&repo=${{ parameters.repo }}
+        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
         projectId: "${{ steps['publish'].output.projectId }}"
         name: ${{ parameters.name }}-secret
         username: ${{ parameters.name }}-secret
@@ -59,7 +61,7 @@ spec:
       name: Gitlab Project Access Token
       action: gitlab:projectAccessToken:create
       input:
-        repoUrl: gitlab.com?owner=thanghumg113-group&repo=${{ parameters.repo }}
+        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
         projectId: "${{ steps['publish'].output.projectId }}"
         name: ${{ parameters.name }}-access-token
         accessLevel: 40
@@ -69,7 +71,7 @@ spec:
       name: Gitlab Project Variable
       action: gitlab:projectVariable:create
       input:
-        repoUrl: gitlab.com?owner=thanghumg113-group&repo=${{ parameters.repo }}
+        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
         projectId: "${{ steps['publish'].output.projectId }}"
         key: 'VARIABLE_NAME'
         value: "${{ steps['gitlab-access-token'].output.access_token }}"
@@ -90,7 +92,7 @@ spec:
       name: Issues
       action: gitlab:issues:create
       input:
-        repoUrl: gitlab.com?owner=thanghumg113-group&repo=${{ parameters.repo }}
+        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
         token: ${{ secrets.USER_OAUTH_TOKEN }}
         projectId: 1111111
         title: Test Issue
