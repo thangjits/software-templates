@@ -1,109 +1,63 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: gitlab-demo
-  title: Gitlab DEMO 1
-  description: Scaffolder Gitlab Demo
+  name: react-gitlab-template
+  title: Create React App (Deploy to GitLab)
+  description: Scaffold a React app and publish it to GitLab
 spec:
-  owner: backstage/techdocs-core
-  type: service
+  owner: user:guest
+  type: website
 
   parameters:
-    - title: Fill in service info
+    - title: Provide project details
       required:
         - name
-        - group
+        - owner
         - repo
       properties:
         name:
-          title: Project Name
           type: string
-          description: Tên project (hiển thị)
-
-        group:
-          title: GitLab Group Name
+          title: Project name
+        owner:
           type: string
-          description: Tên namespace/group trong GitLab đã tồn tại và bạn có quyền (ví dụ: `thanghumg113-group`)
-
+          title: GitLab group or username
         repo:
-          title: Repository Name
           type: string
-          description: Tên repo sẽ được tạo trong group
+          title: GitLab repository name
 
   steps:
-    - id: checkGroup
-      name: Check if GitLab Group exists
-      action: gitlab:group:checkExists
-      input:
-        group: ${{ parameters.group }}
-      if: true  # chạy luôn
-      
-    - id: checkRepo
-      name: Check if Repository already exists
-      action: gitlab:project:checkExists
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-      # Nếu repo đã tồn tại, action sẽ throw lỗi InputError → fail flow luôn
-
     - id: fetch
-      name: Fetch local source
-      action: fetch:plain
+      name: Fetch Template
+      action: fetch:template
       input:
-        url: ./code
+        url: https://github.com/backstage/software-templates/archive/refs/heads/main.zip
+        subpath: scaffolder-templates/create-react-app/template
+        targetPath: .
+
+    - id: rename
+      name: Rename App
+      action: fs:rename
+      input:
+        files:
+          - from: create-react-app-main
+            to: ${{ parameters.name }}
 
     - id: publish
-      name: Publish
+      name: Publish to GitLab
       action: publish:gitlab
       input:
-        description: This is ${{ parameters.name }}
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        sourcePath: pimcore
-        defaultBranch: main
-
-    - id: gitlab-deploy-token
-      name: Create Deploy Token
-      action: gitlab:projectDeployToken:create
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        projectId: "${{ steps['publish'].output.projectId }}"
-        name: ${{ parameters.name }}-secret
-        username: ${{ parameters.name }}-secret
-        scopes: ['read_registry']
-
-    - id: gitlab-access-token
-      name: Gitlab Project Access Token
-      action: gitlab:projectAccessToken:create
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        projectId: "${{ steps['publish'].output.projectId }}"
-        name: ${{ parameters.name }}-access-token
-        accessLevel: 40
-        scopes: ['read_repository', 'write_repository']
-
-    - id: gitlab-project-variable
-      name: Gitlab Project Variable
-      action: gitlab:projectVariable:create
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        projectId: "${{ steps['publish'].output.projectId }}"
-        key: 'VARIABLE_NAME'
-        value: "${{ steps['gitlab-access-token'].output.access_token }}"
-        variableType: 'env_var'
-        masked: true
-        variableProtected: false
-        raw: false
-        environmentScope: '*'
+        allowedHosts: ['gitlab.com']
+        description: React app deployed to GitLab
+        repoUrl: gitlab.com?owner=${{ parameters.owner }}&repo=${{ parameters.repo }}
 
     - id: register
-      name: Register
+      name: Register in catalog
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        repoContentsUrl: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}
+        catalogInfoPath: catalog-info.yaml
 
   output:
     links:
       - title: Repository
-        url: ${{ steps['publish'].output.remoteUrl }}
-      - title: Link to new issue
-        url: ${{ steps['gitlabIssue'].output.issueUrl }}
+        url: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}
