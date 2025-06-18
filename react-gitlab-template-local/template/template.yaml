@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: Gitlab DEMO 2
+  title: Gitlab DEMO 1
   description: Scaffolder Gitlab Demo
 spec:
   owner: backstage/techdocs-core
@@ -100,23 +100,6 @@ spec:
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         catalogInfoPath: '/catalog-info.yaml'
-
-    - id: gitlabIssue
-      name: Issues
-      action: gitlab:issues:create
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        token: ${{ secrets.USER_OAUTH_TOKEN }}
-        projectId: 1111111
-        title: Test Issue
-        assignees:
-          - 2222222
-        description: This is the description of the issue
-        confidential: true
-        createdAt: 2022-09-27 18:00:00.000
-        dueDate: 2024-09-28 12:00:00.000
-        epicId: 3333333
-        labels: phase1:label1,phase2:label2
 
   output:
     links:
