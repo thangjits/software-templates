@@ -19,6 +19,7 @@ spec:
           title: Project Name
           type: string
           description: Tên project (hiển thị)
+          ui:autofocus: true
 
         group:
           title: GitLab Group Name
@@ -31,26 +32,24 @@ spec:
           description: Tên repo sẽ được tạo trong group
 
   steps:
-    - id: checkGroup
-      name: Check if GitLab Group exists
-      action: gitlab:group:ensureExists
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}
-        path:
-          - ${{ parameters.group }}
-      if: true  # chạy luôn
-    - id: checkRepo
-      name: Check if Repository already exists
-      action: gitlab:project:checkExists
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-      # Nếu repo đã tồn tại, action sẽ throw lỗi InputError → fail flow luôn
-
     - id: fetch
       name: Fetch local source
       action: fetch:plain
       input:
         url: ./code
+
+    - id: ensure-group
+      name: Ensure GitLab group exists
+      action: gitlab:group:ensureExists
+      input:
+        repoUrl: gitlab.com?owner=${{ parameters.group }}
+        path: ${{ parameters.group }}
+
+    - id: check-repo
+      name: Check GitLab repository exists
+      action: gitlab:repository:check
+      input:
+        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
 
     - id: publish
       name: Publish
@@ -71,16 +70,6 @@ spec:
         username: ${{ parameters.name }}-secret
         scopes: ['read_registry']
 
-    - id: gitlab-access-token
-      name: Gitlab Project Access Token
-      action: gitlab:projectAccessToken:create
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        projectId: "${{ steps['publish'].output.projectId }}"
-        name: ${{ parameters.name }}-access-token
-        accessLevel: 40
-        scopes: ['read_repository', 'write_repository']
-
     - id: gitlab-project-variable
       name: Gitlab Project Variable
       action: gitlab:projectVariable:create
@@ -88,7 +77,7 @@ spec:
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
         projectId: "${{ steps['publish'].output.projectId }}"
         key: 'VARIABLE_NAME'
-        value: "${{ steps['gitlab-access-token'].output.access_token }}"
+        value: "${{ steps['gitlab-deploy-token'].output.token }}"
         variableType: 'env_var'
         masked: true
         variableProtected: false
@@ -102,26 +91,7 @@ spec:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         catalogInfoPath: '/catalog-info.yaml'
 
-    - id: gitlabIssue
-      name: Issues
-      action: gitlab:issues:create
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        token: ${{ secrets.USER_OAUTH_TOKEN }}
-        projectId: 1111111
-        title: Test Issue
-        assignees:
-          - 2222222
-        description: This is the description of the issue
-        confidential: true
-        createdAt: 2022-09-27 18:00:00.000
-        dueDate: 2024-09-28 12:00:00.000
-        epicId: 3333333
-        labels: phase1:label1,phase2:label2
-
   output:
     links:
       - title: Repository
         url: ${{ steps['publish'].output.remoteUrl }}
-      - title: Link to new issue
-        url: ${{ steps['gitlabIssue'].output.issueUrl }}
