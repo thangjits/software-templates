@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: Gitlab DEMO 1
+  title: Gitlab DEMO 2
   description: Scaffolder Gitlab Demo
 spec:
   owner: backstage/techdocs-core
@@ -33,10 +33,13 @@ spec:
 
   steps:
     - id: fetch
-      name: Fetch local source
-      action: fetch:plain
+      name: Fetch GitLab Source
+      action: fetch:template
       input:
-        url: ./code
+        url: https://gitlab.com/thanghumg113-group/react-app-simple
+        branch: develop-release
+        # Nếu repo là private, bạn có thể thêm trường:
+        # token: ${{ secrets.USER_OAUTH_TOKEN }}
 
     - id: publish
       name: Publish to GitLab
@@ -44,10 +47,10 @@ spec:
       input:
         description: This is ${{ parameters.name }}
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        sourcePath: ./  # Toàn bộ nội dung thư mục code
-        defaultBranch: main
+        sourcePath: ./  # lấy toàn bộ nội dung từ repo fetch về
+        defaultBranch: develop-release
 
-    - id: gitlab-deploy-token
+    - id: create-repositoryrepository
       name: Create Repository
       action: gitlab:projectDeployToken:create
       input:
