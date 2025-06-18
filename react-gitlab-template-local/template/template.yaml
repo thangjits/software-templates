@@ -23,7 +23,7 @@ spec:
         group:
           title: GitLab Group Name
           type: string
-          description: Tên namespace/group trong GitLab mà bạn có quyền
+          description: Tên namespace/group trong GitLab đã tồn tại và bạn có quyền (ví dụ: `thanghumg113-group`)
 
         repo:
           title: Repository Name
@@ -33,18 +33,15 @@ spec:
   steps:
     - id: checkGroup
       name: Check if GitLab Group exists
-      action: gitlab:group:ensureExists
+      action: gitlab:group:checkExists
       input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}
-        path:
-          - ${{ parameters.group }}
-      if: true  # chạy luôn
+        group: ${{ parameters.group }}
+
     - id: checkRepo
       name: Check if Repository already exists
       action: gitlab:project:checkExists
       input:
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-      # Nếu repo đã tồn tại, action sẽ throw lỗi InputError → fail flow luôn
 
     - id: fetch
       name: Fetch local source
