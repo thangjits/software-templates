@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: Gitlab DEMO 1
+  title: Gitlab DEMO 3
   description: Scaffolder Gitlab Demo
 spec:
   owner: backstage/techdocs-core
@@ -23,7 +23,7 @@ spec:
         group:
           title: GitLab Group Name
           type: string
-          description: Tên namespace/group trong GitLab mà bạn có quyền
+          description: Tên namespace/group trong GitLab đã tồn tại và bạn có quyền (ví dụ: `thanghumg113-group`)
 
         repo:
           title: Repository Name
@@ -33,12 +33,10 @@ spec:
   steps:
     - id: checkGroup
       name: Check if GitLab Group exists
-      action: gitlab:group:ensureExists
+      action: gitlab:group:checkExists
       input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}
-        path:
-          - ${{ parameters.group }}
-      if: true  # chạy luôn
+        group: ${{ parameters.group }}
+      
     - id: checkRepo
       name: Check if Repository already exists
       action: gitlab:project:checkExists
@@ -100,24 +98,7 @@ spec:
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
-
-    - id: gitlabIssue
-      name: Issues
-      action: gitlab:issues:create
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        token: ${{ secrets.USER_OAUTH_TOKEN }}
-        projectId: 1111111
-        title: Test Issue
-        assignees:
-          - 2222222
-        description: This is the description of the issue
-        confidential: true
-        createdAt: 2022-09-27 18:00:00.000
-        dueDate: 2024-09-28 12:00:00.000
-        epicId: 3333333
-        labels: phase1:label1,phase2:label2
+        catalogInfoPath: catalog-info.yaml
 
   output:
     links:
