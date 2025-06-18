@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: Gitlab DEMO 3
+  title: Gitlab DEMO 1
   description: Scaffolder Gitlab Demo
 spec:
   owner: backstage/techdocs-core
@@ -44,11 +44,11 @@ spec:
       input:
         description: This is ${{ parameters.name }}
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        sourcePath: ./  # <-- quan trọng: copy toàn bộ nội dung đã fetch
+        sourcePath: ./  # Toàn bộ nội dung thư mục code
         defaultBranch: main
 
     - id: gitlab-deploy-token
-      name: Create Deploy Token
+      name: Create Repository
       action: gitlab:projectDeployToken:create
       input:
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
@@ -56,20 +56,6 @@ spec:
         name: ${{ parameters.name }}-secret
         username: ${{ parameters.name }}-secret
         scopes: ['read_registry']
-
-    - id: gitlab-project-variable
-      name: Gitlab Project Variable
-      action: gitlab:projectVariable:create
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        projectId: "${{ steps['publish'].output.projectId }}"
-        key: 'VARIABLE_NAME'
-        value: "${{ steps['gitlab-deploy-token'].output.token }}"
-        variableType: 'env_var'
-        masked: true
-        variableProtected: false
-        raw: false
-        environmentScope: '*'
 
     - id: register
       name: Register to Backstage
