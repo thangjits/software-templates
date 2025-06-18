@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 2
+  title: GitLab DEMO 5
   description: Scaffolder GitLab Demo
 spec:
   owner: backstage/techdocs-core
@@ -34,30 +34,22 @@ spec:
   steps:
     - id: fetch
       name: Fetch GitLab Source Archive
-      action: fetch:plain
+      action: fetch:template
       input:
         url: https://gitlab.com/thanghumg113-group/react-app-simple/-/archive/develop-release/react-app-simple-develop-release.zip
         targetPath: ./template-source
-        extract: true
-  
-    - id: copy
-      name: Copy extracted content
-      action: custom:copy-directory
-      input:
-        from: ./template-source/react-app-simple-develop-release-develop-release
-        to: ./template-app
-  
+
     - id: publish
       name: Publish to GitLab
       action: publish:gitlab
       input:
         description: This is ${{ parameters.name }}
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        sourcePath: ./template-app
+        sourcePath: ./template-source/react-app-simple-develop-release-develop-release
         defaultBranch: develop-release
 
     - id: create-repository
-      name: Create Gitlab Deploy Token
+      name: Create Gitlab Repository Token
       action: gitlab:projectDeployToken:create
       input:
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
