@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: Gitlab DEMO 2
+  title: Gitlab DEMO 3
   description: Scaffolder Gitlab Demo
 spec:
   owner: backstage/techdocs-core
@@ -38,26 +38,13 @@ spec:
       input:
         url: ./code
 
-    - id: ensure-group
-      name: Ensure GitLab group exists
-      action: gitlab:group:ensureExists
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}
-        path: ${{ parameters.group }}
-
-    - id: check-repo
-      name: Check GitLab repository exists
-      action: gitlab:repository:check
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-
     - id: publish
-      name: Publish
+      name: Publish to GitLab
       action: publish:gitlab
       input:
         description: This is ${{ parameters.name }}
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        sourcePath: pimcore
+        sourcePath: ./  # <-- quan trọng: copy toàn bộ nội dung đã fetch
         defaultBranch: main
 
     - id: gitlab-deploy-token
@@ -85,7 +72,7 @@ spec:
         environmentScope: '*'
 
     - id: register
-      name: Register
+      name: Register to Backstage
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
