@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: Gitlab DEMO 1
+  title: Gitlab DEMO 2
   description: Scaffolder Gitlab Demo
 spec:
   owner: backstage/techdocs-core
