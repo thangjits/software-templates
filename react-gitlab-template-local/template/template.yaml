@@ -2,77 +2,71 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 12
-  description: Scaffolder GitLab Demo
+  title: GitLab DEMO 3
+  description: Scaffold and publish a GitLab project
 spec:
-  owner: backstage/techdocs-core
+  owner: user:guest
   type: service
 
   parameters:
-    - title: Fill in service info
+    - title: Provide project details
       required:
         - name
-        - group
+        - owner
         - repo
       properties:
         name:
-          title: Project Name
           type: string
-          description: Tên project (hiển thị)
-          ui:autofocus: true
+          title: Project name
 
-        group:
-          title: GitLab Group Name
+        owner:
           type: string
-          description: Tên namespace/group trong GitLab mà bạn có quyền
+          title: GitLab group or username
 
         repo:
-          title: Repository Name
           type: string
-          description: Tên repo sẽ được tạo trong group
+          title: GitLab repository name
 
   steps:
-    - id: fetch
-      name: Fetch local source from ./code
+    - id: template
+      name: Fetch local template
       action: fetch:template
       input:
         url: ./code
-        targetPath: ./template-source
         values:
           component_id: ${{ parameters.name }}
-          description: "Generated from GitLab template"
-          destination:
-            owner: ${{ parameters.group }}
-            repo: ${{ parameters.repo }}
-          owner: backstage/techdocs-core
+          description: Generated from local template
+          destination: ${{ parameters.repo | parseRepoUrl }}
+          owner: ${{ parameters.owner }}
 
     - id: publish
       name: Publish to GitLab
       action: publish:gitlab
       input:
-        description: This is ${{ parameters.name }}
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        sourcePath: ./template-source
+        allowedHosts: ['gitlab.com']
+        description: GitLab project for ${{ parameters.name }}
+        repoUrl: gitlab.com?owner=${{ parameters.owner }}&repo=${{ parameters.repo }}
+        sourcePath: .
         defaultBranch: develop-release
 
     - id: create-repository
-      name: Create Gitlab Repository Token
+      name: Create GitLab Deploy Token
       action: gitlab:projectDeployToken:create
       input:
-        repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
+        repoUrl: gitlab.com?owner=${{ parameters.owner }}&repo=${{ parameters.repo }}
         projectId: "${{ steps['publish'].output.projectId }}"
         name: ${{ parameters.name }}-secret
         username: ${{ parameters.name }}-secret
         scopes: ['read_registry']
 
     - id: register
-      name: Register
+      name: Register to Backstage
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        repoContentsUrl: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}
+        catalogInfoPath: catalog-info.yaml
 
   output:
     links:
       - title: Repository
-        url: ${{ steps['publish'].output.remoteUrl }}
+        url: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}
