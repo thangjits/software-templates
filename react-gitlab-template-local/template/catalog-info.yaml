@@ -1,9 +1,0 @@
-apiVersion: backstage.io/v1alpha1
-kind: Component
-metadata:
-  name: react-gitlab-app
-  description: A React app scaffolded by Backstage and deployed to GitLab
-spec:
-  type: website
-  lifecycle: experimental
-  owner: user:thanghumg113
