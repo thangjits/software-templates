@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 3
+  title: GitLab DEMO 5
   description: Scaffolder GitLab Demo
 spec:
   owner: backstage/techdocs-core
@@ -67,9 +67,10 @@ spec:
 
     - id: register
       name: Register to Backstage
-      action: catalog:register
+      action: catalog:file
       input:
-        catalogInfoUrl: https://gitlab.com/${{ parameters.group }}/${{ parameters.repo }}/-/raw/develop-release/catalog-info.yaml
+        repoContentsUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
+        catalogFile: 'catalog-info.yaml'
 
   output:
     links:
