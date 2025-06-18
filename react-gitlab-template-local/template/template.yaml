@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 2
+  title: GitLab DEMO 3
   description: Scaffolder GitLab Demo
 spec:
   owner: backstage/techdocs-core
@@ -33,17 +33,18 @@ spec:
 
   steps:
     - id: fetch
-      name: Fetch source from GitLab tarball
-      action: fetch:plain
+      name: Fetch GitLab Source Archive
+      action: fetch:template
       input:
-        url: https://gitlab.com/thanghumg113-group/react-app-simple/-/archive/develop-release/react-app-simple-develop-release.tar.gz
+        url: https://gitlab.com/thanghumg113-group/react-app-simple/-/archive/develop-release/react-app-simple-develop-release.zip
+        targetPath: ./template-source
 
-    - id: fetch-catalog-info
-      name: Fetch catalog-info.yaml from GitHub
+    - id: fetch-catalog
+      name: Fetch catalog-info.yaml
       action: fetch:plain
       input:
         url: https://raw.githubusercontent.com/thangjits/software-templates/main/react-gitlab-template-local/template/catalog-info.yaml
-        targetPath: ./react-app-simple-develop-release/catalog-info.yaml
+        targetPath: ./ # hoặc thư mục nào đó
       
     - id: publish
       name: Publish to GitLab
@@ -51,7 +52,7 @@ spec:
       input:
         description: This is ${{ parameters.name }}
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        sourcePath: ./react-app-simple-develop-release
+        sourcePath: ./template-source/react-app-simple-develop-release
         defaultBranch: develop-release
 
     - id: create-repository
