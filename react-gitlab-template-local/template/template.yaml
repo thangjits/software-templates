@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 1
+  title: GitLab DEMO 2
   description: Scaffolder GitLab Demo
 spec:
   owner: backstage/techdocs-core
@@ -42,15 +42,10 @@ spec:
   
     - id: copy
       name: Copy extracted content
-      action: backstage:execute
+      action: custom:copy-directory
       input:
-        command: bash
-        args:
-          - -c
-          - |
-            folder=$(find ./template-source -maxdepth 1 -type d -name "react-app-simple-develop-release*" | head -n1)
-            mkdir -p ./template-app
-            cp -r "$folder"/* ./template-app/
+        from: ./template-source/react-app-simple-develop-release-develop-release
+        to: ./template-app
   
     - id: publish
       name: Publish to GitLab
