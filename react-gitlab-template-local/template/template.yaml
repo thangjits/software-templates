@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: react-gitlab-template
-  title: Create React App (Deploy to GitLab1)
+  title: Create React App (Deploy to GitLab22)
   description: Scaffold a React app and publish it to GitLab
 spec:
   owner: user:guest
