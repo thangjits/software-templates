@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 4
+  title: GitLab DEMO 5
   description: Scaffolder GitLab Demo
 spec:
   owner: backstage/techdocs-core
@@ -38,13 +38,6 @@ spec:
       input:
         url: https://gitlab.com/thanghumg113-group/react-app-simple/-/archive/develop-release/react-app-simple-develop-release.zip
         targetPath: ./template-source
-
-    - id: fetch-catalog
-      name: Fetch catalog-info.yaml
-      action: fetch:plain
-      input:
-        url: ./code/catalog-info.yaml
-        targetPath: ./react-app-simple-develop-release
       
     - id: publish
       name: Publish to GitLab
@@ -69,8 +62,7 @@ spec:
       name: Register to Backstage
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        catalogInfoUrl: https://raw.githubusercontent.com/thangjits/software-templates/refs/heads/main/react-gitlab-template-local/template/catalog-info.yaml
 
   output:
     links:
