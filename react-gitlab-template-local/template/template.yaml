@@ -2,8 +2,8 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: Gitlab DEMO 1
-  description: Scaffolder Gitlab Demo
+  title: GitLab DEMO 1
+  description: Scaffolder GitLab Demo
 spec:
   owner: backstage/techdocs-core
   type: service
@@ -33,22 +33,22 @@ spec:
 
   steps:
     - id: fetch
-      name: Fetch GitLab tarball
+      name: Fetch source from GitLab tarball
       action: fetch:plain
       input:
         url: https://gitlab.com/thanghumg113-group/react-app-simple/-/archive/develop-release/react-app-simple-develop-release.tar.gz
-  
+
     - id: publish
       name: Publish to GitLab
       action: publish:gitlab
       input:
         description: This is ${{ parameters.name }}
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        sourcePath: ./react-app-simple-develop-release  # vì tarball giải nén ra thư mục này
+        sourcePath: ./react-app-simple-develop-release
         defaultBranch: develop-release
 
-    - id: create-repositoryrepository
-      name: Create Repository
+    - id: create-repository
+      name: Create Repository Deploy Token
       action: gitlab:projectDeployToken:create
       input:
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
