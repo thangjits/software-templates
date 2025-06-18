@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 6
+  title: GitLab DEMO 5
   description: Scaffolder GitLab Demo
 spec:
   owner: backstage/techdocs-core
@@ -39,18 +39,26 @@ spec:
         url: https://gitlab.com/thanghumg113-group/react-app-simple/-/archive/develop-release/react-app-simple-develop-release.zip
         targetPath: ./template-source
         extract: true
-  
+
+    - id: move
+      name: Move extracted folder to fixed path
+      action: fs:rename
+      input:
+        files:
+          - from: ./template-source/react-app-simple-develop-release*
+            to: ./template-app
+
     - id: publish
       name: Publish to GitLab
       action: publish:gitlab
       input:
         description: This is ${{ parameters.name }}
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
-        sourcePath: ./template-source/react-app-simple-develop-release
+        sourcePath: ./template-app
         defaultBranch: develop-release
 
     - id: create-repository
-      name: Create Gitlab Repository
+      name: Create Gitlab Deploy Token
       action: gitlab:projectDeployToken:create
       input:
         repoUrl: gitlab.com?owner=${{ parameters.group }}&repo=${{ parameters.repo }}
