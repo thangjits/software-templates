@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 4
+  title: GitLab DEMO 5
   description: Scaffold and publish a GitLab project
 spec:
   owner: user:guest
@@ -38,6 +38,8 @@ spec:
           description: Generated from local template
           destination: ${{ parameters.repo | parseRepoUrl }}
           owner: ${{ parameters.owner }}
+          name: ${{ parameters.name }}
+          repo: ${{ parameters.repo }}
 
     - id: publish
       name: Publish to GitLab
