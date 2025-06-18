@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 1
+  title: GitLab DEMO 2
   description: Scaffolder GitLab Demo
 spec:
   owner: backstage/techdocs-core
@@ -38,6 +38,13 @@ spec:
       input:
         url: ./code
         targetPath: ./template-source
+        values:
+          component_id: ${{ parameters.name }}
+          description: "Generated from GitLab template"
+          destination:
+            owner: ${{ parameters.group }}
+            repo: ${{ parameters.repo }}
+          owner: backstage/techdocs-core
 
     - id: publish
       name: Publish to GitLab
