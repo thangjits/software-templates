@@ -33,11 +33,10 @@ spec:
 
   steps:
     - id: fetch
-      name: Fetch from GitLab source
-      action: fetch:gitlab
+      name: Fetch source code as tarball
+      action: fetch:plain
       input:
-        repoUrl: gitlab.com?owner=thanghumg113-group&repo=react-app-simple
-        branch: develop-release
+        url: https://gitlab.com/thanghumg113-group/react-app-simple/-/archive/develop-release/react-app-simple-develop-release.tar.gz
 
     - id: publish
       name: Publish to GitLab
