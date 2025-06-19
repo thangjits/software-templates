@@ -1,14 +1,15 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: "test06"
-  description: "test06 Generated from local template"
+  name: ${{values.component_id | dump}}
+  {%- if values.description %}
+  description: ${{values.description | dump}}
+  {%- endif %}
   annotations:
-    gitlab.com/project-slug: thanghumg113/test06
+    gitlab.com/project-slug: ${{values.destination.owner + "/" + values.destination.repo}}
     backstage.io/techdocs-ref: dir:.
-    backstage.io/ci-url: https://gitlab.com/thanghumg113/test06/-/pipelines
-    backstage.io/kubernetes-id: value
+    backstage.io/kubernetes-id: ${{values.destination.repo}}
 spec:
-  type: service
+  type: website
   lifecycle: experimental
-  owner: "user:guest1"
+  owner: ${{values.owner | dump}}
