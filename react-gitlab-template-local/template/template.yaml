@@ -67,7 +67,7 @@ spec:
       name: Create Kubernetes Namespace
       action: kubernetes:create-namespace
       input:
-        namespace: ${{ parameters.component_id }}-ns
+        namespace: ${{ parameters.component_id }}
         clusterRef: k8s-local-demo-env
         skipTLSVerify: true
           
