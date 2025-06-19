@@ -2,26 +2,30 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 3
+  title: GitLab DEMO 4
   description: Scaffold and publish a GitLab project
 spec:
   owner: demo@jits.com
   type: website
+
   parameters:
     - title: Provide some simple information
       required:
         - component_id
         - owner
+        - repo
       properties:
         component_id:
           title: Name
           type: string
           description: Unique name of the component
           ui:field: EntityNamePicker
+
         description:
           title: Description
           type: string
           description: Help others understand what this website is for.
+
         owner:
           title: Owner
           type: string
@@ -30,10 +34,11 @@ spec:
           ui:options:
             allowedKinds:
               - Group
+
         repo:
           type: string
           title: GitLab repository name
-          
+
   steps:
     - id: template
       name: Fetch local template
@@ -41,11 +46,9 @@ spec:
       input:
         url: ./code
         values:
-          component_id: ${{ parameters.name }}
-          description: Generated from local template
           component_id: ${{ parameters.component_id }}
           description: ${{ parameters.description }}
-          destination: ${{ parameters.repoUrl | parseRepoUrl }}
+          destination: ${{ { owner: parameters.owner, repo: parameters.repo } }}
           owner: ${{ parameters.owner }}
           repo: ${{ parameters.repo }}
 
@@ -54,7 +57,7 @@ spec:
       action: publish:gitlab
       input:
         allowedHosts: ['gitlab.com']
-        description: GitLab project for ${{ parameters.name }}
+        description: GitLab project for ${{ parameters.component_id }}
         repoUrl: gitlab.com?owner=${{ parameters.owner }}&repo=${{ parameters.repo }}
         sourcePath: .
         defaultBranch: develop-release
@@ -65,8 +68,8 @@ spec:
       input:
         repoUrl: gitlab.com?owner=${{ parameters.owner }}&repo=${{ parameters.repo }}
         projectId: "${{ steps['publish'].output.projectId }}"
-        name: ${{ parameters.name }}-secret
-        username: ${{ parameters.name }}-secret
+        name: ${{ parameters.component_id }}-secret
+        username: ${{ parameters.component_id }}-secret
         scopes: ['read_registry']
 
     - id: register
