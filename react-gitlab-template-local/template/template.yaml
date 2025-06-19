@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: create-react-app-gitlab
-  title: Create React App on GitLab 1
+  title: Create React App on GitLab 2
   description: Scaffold and publish a GitLab project
   tags:
     - react
@@ -70,10 +70,6 @@ spec:
         namespace: ${{ parameters.component_id }}-ns
         clusterRef: k8s-local-demo-env
         skipTLSVerify: true
-        labels: |
-          backstage.io/kubernetes-id: ${{ values.component_id }}
-          app.io/type=ns
-          app.io/managed-by=org
           
     - id: register
       name: Register to Backstage
