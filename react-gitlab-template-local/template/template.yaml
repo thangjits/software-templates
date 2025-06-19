@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: create-react-app-gitlab
-  title: Create React App on GitLab 3
+  title: Create React App on GitLab 4
   description: Scaffold and publish a GitLab project
   tags:
     - react
@@ -69,9 +69,6 @@ spec:
       input:
         namespace: ${{ parameters.component_id }}-ns
         clusterRef: k8s-local-demo-env
-        url: https://rancher-local.jitsinnovationlabs.com/k8s/clusters/c-gt2kd
-        token: kubeconfig-u-rsg92v7ttc:zdwl4bzkzwxggn6tslzl7j8bv54t9cvp7crmc8sztjlns9xxqpdt6p
-        authProvider: serviceAccount
         skipTLSVerify: true
         labels: |
           backstage.io/kubernetes-id: ${{ values.component_id }}
