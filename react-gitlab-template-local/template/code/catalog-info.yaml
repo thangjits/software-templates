@@ -1,12 +1,14 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: "test04"
-  description: "test04 Generated from local template"
+  name: "test06"
+  description: "test06 Generated from local template"
   annotations:
-    gitlab.com/project-slug: thanghumg113/test04
+    gitlab.com/project-slug: thanghumg113/test06
     backstage.io/techdocs-ref: dir:.
+    backstage.io/ci-url: https://gitlab.com/thanghumg113/test06/-/pipelines
+    backstage.io/kubernetes-id: value
 spec:
   type: service
   lifecycle: experimental
-  owner: "user:guest"
+  owner: "user:guest1"
