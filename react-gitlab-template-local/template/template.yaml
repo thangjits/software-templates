@@ -2,31 +2,38 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 2
+  title: GitLab DEMO 3
   description: Scaffold and publish a GitLab project
 spec:
-  owner: user:guest
-  type: service
-
+  owner: demo@jits.com
+  type: website
   parameters:
-    - title: Provide project details
+    - title: Provide some simple information
       required:
-        - name
+        - component_id
         - owner
-        - repo
       properties:
-        name:
+        component_id:
+          title: Name
           type: string
-          title: Project name
-
+          description: Unique name of the component
+          ui:field: EntityNamePicker
+        description:
+          title: Description
+          type: string
+          description: Help others understand what this website is for.
         owner:
+          title: Owner
           type: string
-          title: GitLab group or username
-
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
         repo:
           type: string
           title: GitLab repository name
-
+          
   steps:
     - id: template
       name: Fetch local template
@@ -36,9 +43,10 @@ spec:
         values:
           component_id: ${{ parameters.name }}
           description: Generated from local template
-          destination: ${{ parameters.repo | parseRepoUrl }}
+          component_id: ${{ parameters.component_id }}
+          description: ${{ parameters.description }}
+          destination: ${{ parameters.repoUrl | parseRepoUrl }}
           owner: ${{ parameters.owner }}
-          name: ${{ parameters.name }}
           repo: ${{ parameters.repo }}
 
     - id: publish
