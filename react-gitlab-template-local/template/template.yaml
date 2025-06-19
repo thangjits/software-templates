@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: gitlab-demo
-  title: GitLab DEMO 1
+  title: GitLab DEMO 2
   description: Scaffold and publish a GitLab project
 spec:
   owner: user:guest
@@ -65,7 +65,7 @@ spec:
       name: Register to Backstage
       action: catalog:register
       input:
-        catalogInfoUrl: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}/-/raw/develop-release/catalog-info.yaml
+        catalogInfoUrl: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}/-/blob/develop-release/catalog-info.yaml
 
   output:
     links:
