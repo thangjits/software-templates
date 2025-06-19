@@ -1,11 +1,14 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: gitlab-demo
-  title: GitLab DEMO 4
+  name: create-react-app-gitlab
+  title: Create React App on GitLab 1
   description: Scaffold and publish a GitLab project
+  tags:
+    - react
+    - gitlab
 spec:
-  owner: demo@jits.com
+  owner: web@example.com
   type: website
 
   parameters:
@@ -13,19 +16,17 @@ spec:
       required:
         - component_id
         - owner
-        - repo
+        - repoUrl
       properties:
         component_id:
           title: Name
           type: string
           description: Unique name of the component
           ui:field: EntityNamePicker
-
         description:
           title: Description
           type: string
           description: Help others understand what this website is for.
-
         owner:
           title: Owner
           type: string
@@ -34,54 +35,45 @@ spec:
           ui:options:
             allowedKinds:
               - Group
-
-        repo:
+        repoUrl:
+          title: Repository Location
           type: string
-          title: GitLab repository name
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - gitlab.com
 
   steps:
     - id: template
-      name: Fetch local template
+      name: Fetch Skeleton + Template
       action: fetch:template
       input:
         url: ./code
         values:
           component_id: ${{ parameters.component_id }}
           description: ${{ parameters.description }}
-          destination: ${{ { owner: parameters.owner, repo: parameters.repo } }}
+          destination: ${{ parameters.repoUrl | parseRepoUrl }}
           owner: ${{ parameters.owner }}
-          repo: ${{ parameters.repo }}
 
     - id: publish
       name: Publish to GitLab
       action: publish:gitlab
       input:
         allowedHosts: ['gitlab.com']
-        description: GitLab project for ${{ parameters.component_id }}
-        repoUrl: gitlab.com?owner=${{ parameters.owner }}&repo=${{ parameters.repo }}
-        sourcePath: .
-        defaultBranch: develop-release
-
-    - id: create-repository
-      name: Create GitLab Deploy Token
-      action: gitlab:projectDeployToken:create
-      input:
-        repoUrl: gitlab.com?owner=${{ parameters.owner }}&repo=${{ parameters.repo }}
-        projectId: "${{ steps['publish'].output.projectId }}"
-        name: ${{ parameters.component_id }}-secret
-        username: ${{ parameters.component_id }}-secret
-        scopes: ['read_registry']
+        description: This is ${{ parameters.component_id }}
+        repoUrl: ${{ parameters.repoUrl }}
 
     - id: register
       name: Register to Backstage
       action: catalog:register
       input:
-        catalogInfoUrl: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}/-/blob/develop-release/catalog-info.yaml
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: "/catalog-info.yaml"
 
   output:
     links:
       - title: Repository
-        url: https://gitlab.com/${{ parameters.owner }}/${{ parameters.repo }}
+        url: ${{ steps.publish.output.remoteUrl }}
       - title: Open in catalog
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
