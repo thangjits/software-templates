@@ -1,10 +1,10 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: "test33"
-  description: "Generated from local template"
+  name: "test02"
+  description: "test02 Generated from local template"
   annotations:
-    gitlab.com/project-slug: thanghumg113/test01
+    gitlab.com/project-slug: thanghumg113/test02
     backstage.io/techdocs-ref: dir:.
 spec:
   type: service
