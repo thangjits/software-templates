@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: create-react-app-gitlab
-  title: Create React App on GitLab 1
+  title: Create React App on GitLab 
   description: Scaffold and publish a GitLab project
   tags:
     - react
@@ -63,6 +63,32 @@ spec:
         description: This is ${{ parameters.component_id }}
         repoUrl: ${{ parameters.repoUrl }}
 
+    - id: create-kubernetes-namespace
+      name: Create Kubernetes Namespace
+      action: kubernetes:create-namespace
+      input:
+        namespace: ${{ parameters.component_id }}-ns
+        clusterRef: k8s-local-demo-env
+        url: https://rancher-local.jitsinnovationlabs.com/k8s/clusters/c-gt2kd
+        token: kubeconfig-u-rsg92v7ttc:zdwl4bzkzwxggn6tslzl7j8bv54t9cvp7crmc8sztjlns9xxqpdt6p
+        skipTLSVerify: true
+        caData: >-
+          LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJ2VENDQ\
+      VdPZ0F3SUJBZ0lCQURBS0JnZ3Foa2pPUFFRREFqQkdNUnd3R2dZRFZRUUtFeE5rZVc1aGJXbGoKY\
+      kdsemRHVnVaWEl0YjNKbk1TWXdKQVlEVlFRRERCMWtlVzVoYldsamJHbHpkR1Z1WlhJdFkyRkFNV\
+      FkzT1RNNApPVGczT1RBZUZ3MHlNekF6TWpFd09URXhNVGxhRncwek16QXpNVGd3T1RFeE1UbGFNR\
+      Vl4SERBYUJnTlZCQW9UCkUyUjVibUZ0YVdOc2FYTjBaVzVsY2kxdmNtY3hKakFrQmdOVkJBTU1IV\
+      1I1Ym1GdGFXTnNhWE4wWlc1bGNpMWoKWVVBeE5qYzVNemc1T0RjNU1Ga3dFd1lIS29aSXpqMENBU\
+      VlJS29aSXpqMERBUWNEUWdBRUZCOGtDOHQxbkgvRwpVZDE5aW5zYTV3N1NveGtiK2Z0MlBhSmtZb\
+      XpZaFdaTVFkRmZhR2VYampYWlRKVjlFWlZhRDRON0Z6L0hwSFdrCkx3dFc2NmIwUjZOQ01FQXdEZ\
+      1lEVlIwUEFRSC9CQVFEQWdLa01BOEdBMVVkRXdFQi93UUZNQU1CQWY4d0hRWUQKVlIwT0JCWUVGT\
+      3duYjVPMVkvZkNocWZSZ1pBbEUvY1ZpOEgxTUFvR0NDcUdTTTQ5QkFNQ0EwZ0FNRVVDSVFDagpze\
+      UJYT3ZjdlFCc1FIbjRXSCtIWlQ4UWZiT21zRVpkUFRMV29QU0ZOakFJZ0ZaQ1l4aWdiRGxUa2Rqd\
+      0xjTjU2CklrdCtVOHZ1UGhEa04xZWo2citEMXd3PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t
+        labels: |
+          app.io/type=ns;
+          app.io/managed-by=org;
+          
     - id: register
       name: Register to Backstage
       action: catalog:register
