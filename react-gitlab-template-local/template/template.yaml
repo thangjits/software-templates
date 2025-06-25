@@ -2,7 +2,7 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: create-react-app-gitlab
-  title: Create React App on GitLab 2
+  title: Create React App on GitLab 3
   description: Scaffold and publish a GitLab project
   tags:
     - react
@@ -69,8 +69,93 @@ spec:
         url: https://rancher-local.jitsinnovationlabs.com/k8s/clusters/c-gt2kd
         token: kubeconfig-u-rsg92v7ttc:zdwl4bzkzwxggn6tslzl7j8bv54t9cvp7crmc8sztjlns9xxqpdt6p
         skipTLSVerify: true
-        labels: "backstage.io/kubernetes-id=${{ parameters.component_id }}"
-          
+        labels:
+          backstage.io/kubernetes-id: ${{ parameters.component_id }}
+
+    - id: create-deployment
+      name: Create Deployment
+      action: kubernetes:apply
+      input:
+        url: https://rancher-local.jitsinnovationlabs.com/k8s/clusters/c-gt2kd
+        token: kubeconfig-u-rsg92v7ttc:zdwl4bzkzwxggn6tslzl7j8bv54t9cvp7crmc8sztjlns9xxqpdt6p
+        skipTLSVerify: true
+        namespace: ${{ parameters.component_id }}
+        manifests:
+          - apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: ${{ parameters.component_id }}
+              labels:
+                app: ${{ parameters.component_id }}
+                backstage.io/kubernetes-id: ${{ parameters.component_id }}
+            spec:
+              replicas: 1
+              selector:
+                matchLabels:
+                  app: ${{ parameters.component_id }}
+              template:
+                metadata:
+                  labels:
+                    app: ${{ parameters.component_id }}
+                    backstage.io/kubernetes-id: ${{ parameters.component_id }}
+                spec:
+                  containers:
+                    - name: app
+                      image: nginx:latest
+                      ports:
+                        - containerPort: 80
+
+    - id: create-service
+      name: Create Service
+      action: kubernetes:apply
+      input:
+        url: https://rancher-local.jitsinnovationlabs.com/k8s/clusters/c-gt2kd
+        token: kubeconfig-u-rsg92v7ttc:zdwl4bzkzwxggn6tslzl7j8bv54t9cvp7crmc8sztjlns9xxqpdt6p
+        skipTLSVerify: true
+        namespace: ${{ parameters.component_id }}
+        manifests:
+          - apiVersion: v1
+            kind: Service
+            metadata:
+              name: ${{ parameters.component_id }}
+              labels:
+                backstage.io/kubernetes-id: ${{ parameters.component_id }}
+            spec:
+              selector:
+                app: ${{ parameters.component_id }}
+              ports:
+                - protocol: TCP
+                  port: 80
+                  targetPort: 80
+
+    - id: create-ingress
+      name: Create Ingress
+      action: kubernetes:apply
+      input:
+        url: https://rancher-local.jitsinnovationlabs.com/k8s/clusters/c-gt2kd
+        token: kubeconfig-u-rsg92v7ttc:zdwl4bzkzwxggn6tslzl7j8bv54t9cvp7crmc8sztjlns9xxqpdt6p
+        skipTLSVerify: true
+        namespace: ${{ parameters.component_id }}
+        manifests:
+          - apiVersion: networking.k8s.io/v1
+            kind: Ingress
+            metadata:
+              name: ${{ parameters.component_id }}-ingress
+              labels:
+                backstage.io/kubernetes-id: ${{ parameters.component_id }}
+            spec:
+              rules:
+                - host: ${{ parameters.component_id }}.example.com
+                  http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: ${{ parameters.component_id }}
+                            port:
+                              number: 80
+
     - id: register
       name: Register to Backstage
       action: catalog:register
