@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: thanghumg113
+  description: Example group for Thang
+spec:
+  type: team
+  profile:
+    displayName: Thang HUMG Team
+  children: []
