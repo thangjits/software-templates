@@ -2,9 +2,10 @@ apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
   name: thanghumg113
-  description: Example group for Thang
+  description: HUMG user group
 spec:
   type: team
   profile:
     displayName: Thang HUMG Team
+    email: thanghumg113@example.com
   children: []
