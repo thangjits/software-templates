@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: thanghumg113
+  namespace: default
+spec:
+  profile:
+    displayName: Thang Humg
+    email: thang@example.com
+  memberOf:
+    - thanghumg113
